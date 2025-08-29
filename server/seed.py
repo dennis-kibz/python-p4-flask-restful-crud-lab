@@ -23,6 +23,28 @@ with app.app_context():
         price=25.98,
         is_in_stock=False,
     )
+    dandelion = Plant(
+        id=3,
+        name="Dandelion",
+        image="./images/dandelion.jpg",
+        price=5.00,
+        is_in_stock=True,
+    )
+    jade_plant = Plant(
+        id=4,
+        name="Jade Plant",
+        image="./images/jade-plant.jpg",
+        price=15.00,
+        is_in_stock=True,
+    )
+    pothos = Plant(
+        id=5,
+        name="Pothos",
+        image="./images/pothos.jpg",
+        price=20.00,
+        is_in_stock=False,
+    )   
+        
 
-    db.session.add_all([aloe, zz_plant])
+    db.session.add_all([aloe, zz_plant, dandelion, jade_plant, pothos])
     db.session.commit()

@@ -44,30 +44,49 @@ api.add_resource(Plants, '/plants')
 class PlantByID(Resource):
 
     def get(self, id):
-        plant = Plant.query.filter_by(id=id).first().to_dict()
-        return make_response(jsonify(plant), 200)
+        plant = Plant.query.filter_by(id=id).first()
+        return make_response(jsonify(plant.to_dict()), 200)
     
     def patch(self, id):
-        plant = Plant.query.filter_by(id=id).first().to_dict()
+        print(f"Patch request for plant ID: {id}")
+        plant = Plant.query.filter_by(id=id).first()
 
         if not plant:
+            print("Plant not found")
             return make_response(jsonify({"error": "Plant not found"}), 404)
         
         data = request.get_json()
+        print(f"Request data: {data}")
 
         try:
-            if 'name' in data:
-                plant.name = data['name']
-            if 'image' in data:
-                plant.image = data['image']
-            if 'price' in data:
-                plant.price = data['price'] 
-            if 'in_stock' in data:
-                plant.in_stock = data['in_stock']
+            # Update only the fields that are provided in the request
+            for key in data:
+                if hasattr(plant, key):
+                    print(f"Updating {key} to {data[key]}")
+                    setattr(plant, key, data[key])
+            
 
             db.session.commit()
-            return make_response(plant.to_dict(), 200)
+
+            plant_dict = plant.to_dict()
+            print(f"Plant dict from to_dict(): {plant_dict}")
+            print(f"Plant dict keys: {plant_dict.keys()}")
+            
+            # Temporary: Manual dict creation to test
+            manual_dict = {
+                'id': plant.id,
+                'name': plant.name,
+                'image': plant.image,
+                'price': plant.price,
+                'is_in_stock': plant.is_in_stock
+            }
+            print(f"Manual dict: {manual_dict}")
+
+            return make_response(jsonify(plant.to_dict()), 200)
         except Exception as e:
+            print(f"Error during patch: {e}")
+            db.session.rollback()
+
             return make_response(jsonify({"error": str(e)}), 400)
         
     def delete(self, id):
